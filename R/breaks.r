@@ -53,13 +53,23 @@ extended_breaks <- function(n = 5, ...) {
 log_breaks <- function(n = 5, base = 10) {
   function(x) {
     rng <- log(range(x, na.rm = TRUE), base = base)
-    min <- floor(rng[1])
-    max <- ceiling(rng[2])
+    diff <- rng[1] - rng[0]
+    if (diff == 0) {
+      return(base ^ min)
+    }
+    if (diff > 2) {
+      min <- floor(rng[1])
+      max <- ceiling(rng[2])
 
-    if (max == min) return(base ^ min)
+      by <- floor((max - min) / n) + 1
+      base ^ seq(min, max, by = by)
+    } else if (diff > 0.2) {
+      min <- floor(rng[1] * 10)
+      max <- ceiling(rng[2] * 10)
 
-    by <- floor((max - min) / n) + 1
-    base ^ seq(min, max, by = by)
+      by <- floor((max - min) / n) + 1
+      base ^ (seq(min, max, by = by) / 10)
+    }
   }
 }
 
